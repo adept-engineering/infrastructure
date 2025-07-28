@@ -23,6 +23,8 @@ module "security" {
   vpc_id                = module.networking.vpc_id
   vpc_cidr              = var.vpc_cidr
   alb_security_group_id = module.load_balancer.alb_security_group_id
+  enable_public_ssh     = var.enable_public_ssh
+  additional_ports      = var.additional_ports
   tags = {
     Owner = var.owner
   }
@@ -51,6 +53,7 @@ module "load_balancer" {
   environment = var.environment
   vpc_id      = module.networking.vpc_id
   subnet_ids  = module.networking.public_subnet_ids
+  additional_ports = var.additional_ports
   tags = {
     Owner = var.owner
   }

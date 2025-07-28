@@ -27,4 +27,16 @@ variable "tags" {
   description = "Additional tags."
   type        = map(string)
   default     = {}
+}
+
+variable "enable_public_ssh" {
+  description = "Enable public SSH access to EC2 instances (0.0.0.0/0)."
+  type        = bool
+  default     = true
+}
+
+variable "additional_ports" {
+  description = "Additional ports to be accessible through the ALB."
+  type        = list(number)
+  default     = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010]
 } 

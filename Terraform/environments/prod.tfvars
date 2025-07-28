@@ -16,4 +16,8 @@ backend_dynamodb_table = "acqua-tfstate-lock"
 
 db_password = "your-prod-db-password-here"
 
+# SSH and Port Configuration
+enable_public_ssh = false  # Disable public SSH for production security
+additional_ports = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010]
+
 // ... other prod-specific settings ... 

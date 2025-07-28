@@ -7,7 +7,6 @@ variable "environment" {
 variable "project" {
   description = "Project identifier for naming and tagging."
   type        = string
-  default     = "acqua"
 }
 
 variable "aws_region" {
@@ -79,4 +78,16 @@ variable "db_password" {
   description = "Master password for the RDS database."
   type        = string
   sensitive   = true
+}
+
+variable "enable_public_ssh" {
+  description = "Enable public SSH access to EC2 instances (0.0.0.0/0)."
+  type        = bool
+  default     = true
+}
+
+variable "additional_ports" {
+  description = "Additional ports to be accessible through the ALB (3000-3010)."
+  type        = list(number)
+  default     = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010]
 } 

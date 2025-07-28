@@ -77,6 +77,17 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Allow additional ports from internet (3000-3010)
+  dynamic "ingress" {
+    for_each = var.additional_ports
+    content {
+      protocol    = "tcp"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+
   egress {
     protocol    = "-1"
     from_port   = 0

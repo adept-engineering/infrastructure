@@ -11,5 +11,5 @@ output "rds_endpoint" {
 
 output "ec2_ssh_command" {
   description = "SSH command to connect to the EC2 instance."
-  value       = "ssh -i ${var.ssh_key_path} ec2-user@${module.compute.ec2_public_ip}"
+  value       = "ssh -i ${var.ssh_key_path} ubuntu@${module.compute.ec2_public_ip}"
 } 

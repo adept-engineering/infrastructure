@@ -32,6 +32,10 @@ After generating keys, you'll need to import them into AWS:
 ```bash
 # Import the public key to AWS
 aws ec2 import-key-pair --key-name acqua-key-qa --public-key-material file://qa-key.pem.pub
+
+aws ec2 import-key-pair --key-name acqua-key-qa --public-key-material "$(cat Terraform/keys/qa-key.pem.pub | base64)"
+
+
 aws ec2 import-key-pair --key-name acqua-key-prod --public-key-material file://prod-key.pem.pub
 ```
 
@@ -41,8 +45,8 @@ SSH into your instances using:
 
 ```bash
 # QA environment
-ssh -i keys/qa-key.pem ec2-user@<ec2-public-ip>
+ssh -i keys/qa-key.pem ubuntu@<ec2-public-ip>
 
 # Production environment  
-ssh -i keys/prod-key.pem ec2-user@<ec2-public-ip>
+ssh -i keys/prod-key.pem ubuntu@<ec2-public-ip>
 ``` 

@@ -1,10 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = var.backend_bucket
-    key            = "acqua-${var.environment}/terraform.tfstate"
-    region         = var.backend_region
-    dynamodb_table = var.backend_dynamodb_table
+    bucket         = "acqua-tfstate-bucket"
+    key            = "acqua-{environment}/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "acqua-tfstate-lock"
     encrypt        = true
-    versioning     = true
   }
 } 

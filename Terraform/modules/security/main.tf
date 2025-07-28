@@ -18,12 +18,34 @@ resource "aws_security_group" "ec2" {
     security_group_ids       = [var.alb_security_group_id]
   }
 
-  # Allow SSH from VPC
+  # Allow additional ports from ALB (3000-3010)
+  dynamic "ingress" {
+    for_each = var.additional_ports
+    content {
+      protocol                 = "tcp"
+      from_port                = ingress.value
+      to_port                  = ingress.value
+      security_group_ids       = [var.alb_security_group_id]
+    }
+  }
+
+  # Allow SSH from VPC (always allowed)
   ingress {
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
     cidr_blocks = [var.vpc_cidr]
+  }
+
+  # Conditionally allow public SSH access
+  dynamic "ingress" {
+    for_each = var.enable_public_ssh ? [1] : []
+    content {
+      protocol    = "tcp"
+      from_port   = 22
+      to_port     = 22
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   # Allow all outbound traffic

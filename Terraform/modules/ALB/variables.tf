@@ -76,4 +76,10 @@ variable "tags" {
   description = "Additional tags."
   type        = map(string)
   default     = {}
+}
+
+variable "additional_ports" {
+  description = "Additional ports to be accessible through the ALB."
+  type        = list(number)
+  default     = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010]
 } 
