@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <linearGradient id="adept-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#012a52"/>
+      <stop offset="45%" stop-color="#01509A"/>
+      <stop offset="100%" stop-color="#0284d4"/>
+    </linearGradient>
+    <radialGradient id="adept-glow" cx="70%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="adept-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1" fill="none"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#adept-bg)"/>
+  <rect width="1920" height="1080" fill="url(#adept-grid)"/>
+  <rect width="1920" height="1080" fill="url(#adept-glow)"/>
+  <circle cx="1680" cy="180" r="220" fill="#ffffff" fill-opacity="0.04"/>
+  <circle cx="220" cy="900" r="280" fill="#000000" fill-opacity="0.12"/>
+</svg>

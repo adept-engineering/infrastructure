@@ -1,0 +1,17 @@
+# Secrets — never commit
+.env
+.adept-users.env
+*.pem
+*.key
+*.p12
+*credentials*
+*secrets*
+
+# Runtime / local artifacts
+logs/
+*.log
+data/profiles/*
+!data/profiles/.gitkeep
+.playwright/
+node_modules/
+__pycache__/

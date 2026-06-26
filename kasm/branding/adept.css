@@ -1,0 +1,206 @@
+/* Adept Engineering Solutions — Kasm UI theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --adept-blue: #01509A;
+  --adept-blue-dark: #012a52;
+  --adept-blue-light: #0284d4;
+  --adept-name-blue: #6ec8ff;
+  --adept-surface: #0c1524;
+  --adept-surface-2: #111d31;
+  --adept-border: rgba(255, 255, 255, 0.08);
+  --adept-text: #e8eef6;
+  --adept-muted: #8fa8c4;
+}
+
+html,
+body,
+#root,
+.app {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Login layout */
+.login-flex,
+[class*="login-flex"] {
+  background: linear-gradient(135deg, #070d18 0%, var(--adept-surface) 55%, #0a1628 100%) !important;
+}
+
+.login_box:not([class*="tw-bg-center"]),
+.login-card-top,
+[class*="login-card-top"] {
+  background: transparent !important;
+}
+
+/* Left login panel accent */
+.login_box.tw-w-full,
+.tw-p-8.login-card-top {
+  border-right: 1px solid var(--adept-border);
+}
+
+.login-card-top h1,
+[class*="login-card-top"] h1 {
+  color: var(--adept-text) !important;
+  font-size: 1.75rem !important;
+  letter-spacing: -0.02em;
+}
+
+.login-card-top h1::after {
+  content: 'Sign in to continue';
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--adept-muted);
+}
+
+/* Right branding panel */
+[class*="tw-bg-center"][class*="login_box"] {
+  background-color: var(--adept-blue-dark) !important;
+  background-image: url('/branding/login-splash.svg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Logo on splash */
+[class*="tw-bg-center"] img,
+.login_box img[src*="logo"] {
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.28));
+  max-height: 140px !important;
+  width: auto !important;
+}
+
+.logo-bottom-txt {
+  text-align: center !important;
+  width: 100%;
+}
+
+/* Company name — CSS fallback if JS runs late on SPA login */
+.logo-bottom-txt::before {
+  content: 'Adept Engineering Solutions';
+  display: block;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--adept-name-blue) !important;
+  margin: 1.25rem auto 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  max-width: 26rem;
+  text-shadow: 0 2px 14px rgba(1, 80, 154, 0.4);
+}
+
+.logo-bottom-txt[data-adept-branded="1"]::before {
+  content: none;
+}
+
+.adept-company-name {
+  display: block;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--adept-name-blue) !important;
+  margin: 1.25rem auto 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  max-width: 26rem;
+  text-shadow: 0 2px 14px rgba(1, 80, 154, 0.4);
+}
+
+.adept-tagline,
+.logo-bottom-txt .adept-tagline {
+  display: block;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+  max-width: 24rem;
+  margin: 0 auto !important;
+  line-height: 1.5;
+}
+
+/* Legacy Kasm headings — hidden once JS injects our block */
+.logo-bottom-txt h5:not(.adept-tagline),
+.logo-bottom-txt h6:not(.adept-tagline) {
+  display: none !important;
+}
+
+.logo-bottom-txt p,
+.smaller-text p {
+  display: none !important;
+}
+
+/* Form fields */
+.login-card-top label,
+[class*="login-card-top"] label {
+  color: var(--adept-muted) !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+}
+
+.login-card-top input,
+[class*="login-card-top"] input,
+.login_box input[type="email"],
+.login_box input[type="password"],
+.login_box input[type="text"] {
+  background: var(--adept-surface-2) !important;
+  border: 1px solid var(--adept-border) !important;
+  border-radius: 10px !important;
+  color: var(--adept-text) !important;
+  min-height: 44px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.login-card-top input:focus,
+[class*="login-card-top"] input:focus,
+.login_box input:focus {
+  border-color: var(--adept-blue-light) !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 212, 0.22) !important;
+  outline: none !important;
+}
+
+/* Primary button */
+.btn-primary,
+button[type="submit"].btn-primary,
+.login_box .btn-primary {
+  background: linear-gradient(180deg, #0270c9 0%, var(--adept-blue) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  min-height: 44px;
+  box-shadow: 0 8px 20px rgba(1, 80, 154, 0.35);
+}
+
+.btn-primary:hover,
+button[type="submit"].btn-primary:hover {
+  background: linear-gradient(180deg, #0284d4 0%, #013d75 100%) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  transform: translateY(-1px);
+}
+
+/* Post-login header */
+.app-header,
+.navbar,
+header.navbar {
+  background: linear-gradient(90deg, var(--adept-blue-dark), var(--adept-blue)) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.app-header .navbar-brand img,
+.header-logo img,
+.navbar-brand img {
+  max-height: 34px !important;
+  width: auto !important;
+}
+
+/* Workspace launcher cards */
+.card,
+.workspace-card {
+  border-radius: 12px !important;
+}
+
+/* Loading overlay */
+[class*="loading"],
+.session-loading {
+  color: var(--adept-text) !important;
+}

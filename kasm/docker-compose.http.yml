@@ -1,0 +1,9 @@
+services:
+  adept-kasm-http:
+    image: nginx:1.26-alpine
+    container_name: adept-kasm-http
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./nginx/http-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./branding:/home/ubuntu/workspace/kasm/branding:ro
