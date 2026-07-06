@@ -42,6 +42,24 @@ See **[docs/README.md](docs/README.md)** — architecture, HTTPS, onboarding, tr
 
 ## Layout
 
+On **Desktop-server**, `~/workspace/kasm` is a symlink to this directory inside the git repo:
+
+```
+~/workspace/
+├── infrastructure/          # git clone — push changes from here
+│   └── kasm/                # canonical copy (this tree)
+└── kasm -> infrastructure/kasm
+```
+
+Server-only files (gitignored): `.env`, `.adept-users.env`, `logs/`
+
+**Workflow:** edit under `~/workspace/kasm` (or `~/workspace/infrastructure/kasm`), then:
+
+```bash
+cd ~/workspace/infrastructure
+git add kasm && git commit -m "..." && git push origin main
+```
+
 ```
 kasm/
 ├── config/adept.defaults.env
