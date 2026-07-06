@@ -46,7 +46,9 @@ fi
 
 docker exec kasm_db psql -U kasmapp -d kasm -v ON_ERROR_STOP=1 -c \
   "UPDATE images SET memory = ${per_session_bytes}, cores = ${cores_desktop}
-   WHERE friendly_name IN ('Ubuntu Noble', 'Ubuntu Jammy', 'Visual Studio Code');"
+   WHERE friendly_name IN ('Ubuntu Noble', 'Ubuntu Jammy', 'Visual Studio Code')
+     AND friendly_name NOT LIKE '%(%GB)%' AND friendly_name NOT LIKE '%(%MB)%'
+     AND friendly_name NOT LIKE 'Adept Dev%';"
 
 docker exec kasm_db psql -U kasmapp -d kasm -v ON_ERROR_STOP=1 -c \
   "UPDATE images SET memory = $(( per_session_bytes * 3 / 4 )), cores = ${cores_light}

@@ -26,7 +26,9 @@ Operational docs for Kasm Workspaces CE on **Desktop-server** (`workspaces.adept
 | [18-session-connect-fix.md](18-session-connect-fix.md) | Play button / HTTPS fix |
 | [19-https-domain.md](19-https-domain.md) | **Production** TLS + nginx |
 | [20-workspace-sudo.md](20-workspace-sudo.md) | Passwordless sudo in desktops |
-| [21-onboarding.md](21-onboarding.md) | **Admin guide** — add users |
+| [21-onboarding.md](21-onboarding.md) | Admin user onboarding |
+| [22-user-identity-and-ram.md](22-user-identity-and-ram.md) | Terminal username + per-user RAM tiers |
+| [23-adept-dev-workspaces.md](23-adept-dev-workspaces.md) | Admin-gated Adept Dev (full tool stack) |
 
 ## Quick access
 

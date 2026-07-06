@@ -32,6 +32,11 @@ bash "${SCRIPT_DIR}/apply-branding.sh"
 adept_log "Ensuring passwordless sudo in workspace containers"
 bash "${SCRIPT_DIR}/enable-workspace-sudo.sh" --live
 
+if [[ -f "${SCRIPT_DIR}/../config/dev-access.env" ]]; then
+  adept_log "Syncing admin-gated Adept Dev workspace access"
+  bash "${SCRIPT_DIR}/sync-dev-access.sh"
+fi
+
 adept_log "Running healthcheck"
 bash "${SCRIPT_DIR}/healthcheck.sh"
 

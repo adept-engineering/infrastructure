@@ -10,7 +10,11 @@ All scripts source `lib/common.sh` and read server `.env` for admin credentials 
 | `generate-workspaces-certs.sh` | Issue/expand TLS cert (root) |
 | `renew-workspaces-certs.sh` | Cert renewal (cron) |
 | `create-user.sh` | Create user by email (admin API) |
-| `enable-workspace-sudo.sh` | Passwordless sudo in desktop containers |
+| `apply-user-identity.sh` | Linux `whoami` + sudo via exec_config |
+| `apply-user-resources.sh` | Per-user RAM tiers from `config/user-resources.env` |
+| `provision-dev-workspaces.sh` | Admin-gated **Adept Dev** workspace (16 GB + tools) |
+| `sync-dev-access.sh` | Grant/revoke Adept Dev from `config/dev-access.env` |
+| `grant-dev-access.sh` / `revoke-dev-access.sh` | One-user Adept Dev access |
 | `apply-branding.sh` | Sync Adept branding to Kasm + nginx |
 | `resource-governor.sh` | Rebalance per-session RAM/CPU |
 | `provision-adept-users.sh` | Bulk test users adept-u01..05 |
