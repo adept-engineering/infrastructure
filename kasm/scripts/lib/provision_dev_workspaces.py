@@ -69,19 +69,33 @@ def main() -> None:
             f"INSERT INTO groups (group_id, name, priority, is_system) VALUES ('{grp_id}', '{GROUP_NAME}', {GROUP_PRIORITY}, false);"
         )
 
+    existing_img = psql_scalar(f"SELECT image_id FROM images WHERE friendly_name = '{WORKSPACE_NAME}' LIMIT 1;")
+
     for name in LEGACY_NAMES:
         parts.append(
             f"DELETE FROM group_images WHERE image_id IN (SELECT image_id FROM images WHERE friendly_name = '{name}');"
         )
         parts.append(f"DELETE FROM images WHERE friendly_name = '{name}';")
 
-    parts.append(
-        f"DELETE FROM group_images WHERE image_id IN (SELECT image_id FROM images WHERE friendly_name = '{WORKSPACE_NAME}');"
-    )
-    parts.append(f"DELETE FROM images WHERE friendly_name = '{WORKSPACE_NAME}';")
-
-    parts.append(
-        f"""
+    if existing_img:
+        parts.append(
+            f"""
+UPDATE images SET
+  cores = 4,
+  memory = {mem_bytes},
+  description = 'Admin-gated 16 GB dev desktop: Cursor, VS Code, Claude Code, Antigravity, Devin',
+  exec_config = '{exec_cfg}'::json,
+  persistent_profile_path = '{PROFILE_PATH}',
+  enabled = true,
+  available = true,
+  hidden = false
+WHERE image_id = '{existing_img}';
+"""
+        )
+        img_id = existing_img
+    else:
+        parts.append(
+            f"""
 INSERT INTO images (
   image_id, cores, description, docker_registry, docker_token, docker_user,
   image_src, enabled, available, friendly_name, memory, name, run_config,
@@ -93,7 +107,7 @@ INSERT INTO images (
 )
 SELECT
   '{img_id}', 4,
-  'Admin-gated 16 GB dev desktop: Cursor, Claude Code, Antigravity, Devin',
+  'Admin-gated 16 GB dev desktop: Cursor, VS Code, Claude Code, Antigravity, Devin',
   docker_registry, docker_token, docker_user,
   image_src, true, true, '{WORKSPACE_NAME}', {mem_bytes}, name, run_config,
   volume_mappings, restrict_network_names, '{exec_cfg}'::json, categories,
@@ -103,12 +117,17 @@ SELECT
   '{PROFILE_PATH}'
 FROM images WHERE image_id = '{base_id}';
 """
+        )
+
+    parts.append(
+        f"DELETE FROM group_images WHERE group_id = '{grp_id}' AND image_id NOT IN (SELECT image_id FROM images WHERE friendly_name = '{WORKSPACE_NAME}');"
     )
     parts.append(
-        f"DELETE FROM group_images WHERE group_id = '{grp_id}' AND image_id IN (SELECT image_id FROM images WHERE friendly_name LIKE 'Adept Dev%');"
-    )
-    parts.append(
-        f"INSERT INTO group_images (group_image_id, group_id, image_id) VALUES (uuid_generate_v4(), '{grp_id}', '{img_id}');"
+        f"""INSERT INTO group_images (group_image_id, group_id, image_id)
+SELECT uuid_generate_v4(), '{grp_id}', '{img_id}'
+WHERE NOT EXISTS (
+  SELECT 1 FROM group_images WHERE group_id = '{grp_id}' AND image_id = '{img_id}'
+);"""
     )
 
     parts.append("COMMIT;")

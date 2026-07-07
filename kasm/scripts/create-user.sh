@@ -46,3 +46,9 @@ if "user" not in d:
 print(f"Created: {email}")
 print(f"Password: {pw}")
 PY
+
+adept_log "Assigning RAM tier (if configured in config/user-resources.env)"
+if [[ -f "${SCRIPT_DIR}/../config/user-resources.env" ]]; then
+  bash "${SCRIPT_DIR}/apply-user-resources.sh"
+fi
+adept_log "Identity (whoami) applies automatically on first workspace launch for all users"

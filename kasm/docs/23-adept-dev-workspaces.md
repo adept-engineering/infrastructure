@@ -9,6 +9,7 @@ Same base as the power-user tier (Ubuntu Jammy, sudo, Linux username from Kasm l
 | Tool | Setup |
 |------|--------|
 | **Cursor** | `.deb` install + desktop shortcut |
+| **Visual Studio Code** | Microsoft `code` package + desktop shortcut |
 | **Claude Code** | Node 20 + global CLI + desktop shortcut |
 | **Antigravity** | Desktop shortcut → official download (Google sign-in) |
 | **Devin** | Desktop shortcut → web app (Cognition sign-in) |

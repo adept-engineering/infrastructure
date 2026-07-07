@@ -29,8 +29,8 @@ docker exec kasm_db psql -U kasmapp -d kasm -q -c \
 adept_log "Applying Adept branding"
 bash "${SCRIPT_DIR}/apply-branding.sh"
 
-adept_log "Ensuring passwordless sudo in workspace containers"
-bash "${SCRIPT_DIR}/enable-workspace-sudo.sh" --live
+adept_log "Applying user identity (whoami) for all users on all workspaces"
+bash "${SCRIPT_DIR}/apply-user-identity.sh" --live
 
 if [[ -f "${SCRIPT_DIR}/../config/dev-access.env" ]]; then
   adept_log "Syncing admin-gated Adept Dev workspace access"

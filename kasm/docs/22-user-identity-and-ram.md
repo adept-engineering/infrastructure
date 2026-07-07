@@ -34,14 +34,18 @@ You only get the RAM for your tier. Using more than that can trigger OOM (sessio
 ~/workspace/kasm/scripts/apply-user-identity.sh
 ```
 
-This enables `expose_user_environment_vars` and renames the Linux user from `KASM_USER` on first session start.
+This enables `expose_user_environment_vars` and on session start:
 
-| Kasm username | Terminal `whoami` (after fix) |
-|---------------|-------------------------------|
-| `remikuti` | `remikuti` |
-| `great.abiegbe@adeptengr.com` | `great.abiegbe_adeptengr.com` (sanitized) |
+1. Renames the Linux user from `KASM_USER` (`whoami` matches your login)
+2. Sets home to `/home/<username>` (not `/home/kasm-user`)
+3. Kasm still syncs profiles via `/home/kasm-user` internally; your session uses `/home/<username>`
 
-**Tip:** use short POSIX usernames (`remikuti`) in the admin UI if you want clean terminal names.
+| Kasm username | Terminal `whoami` | Home directory |
+|---------------|-------------------|----------------|
+| `remikuti` | `remikuti` | `/home/remikuti` |
+| `great.abiegbe@adeptengr.com` | `great.abiegbe_adeptengr.com` | `/home/great.abiegbe_adeptengr.com` |
+
+**Tip:** use short POSIX usernames (`remikuti`) in the admin UI if you want clean terminal and path names.
 
 Users must **end the session and start a new one** after this is applied.
 
