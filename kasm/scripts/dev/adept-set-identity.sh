@@ -29,15 +29,14 @@ if id kasm-user >/dev/null 2>&1; then
 fi
 
 if [[ -d "$OLD_HOME" ]]; then
-  if mountpoint -q "$NEW_HOME" 2>/dev/null; then
-    :
-  elif [[ -L "$NEW_HOME" ]] && [[ "$(readlink -f "$NEW_HOME")" == "$(readlink -f "$OLD_HOME")" ]]; then
-    :
-  else
-    rm -rf "$NEW_HOME"
-    mkdir -p "$NEW_HOME"
+  # Prefer a real bind mount over symlink so UI path bars keep /home/<username>.
+  if [[ -L "$NEW_HOME" ]]; then
+    rm -f "$NEW_HOME"
+  fi
+  if ! mountpoint -q "$NEW_HOME" 2>/dev/null; then
+    [[ -e "$NEW_HOME" ]] || mkdir -p "$NEW_HOME"
     if ! mount --bind "$OLD_HOME" "$NEW_HOME" 2>/dev/null; then
-      rmdir "$NEW_HOME" 2>/dev/null || rm -rf "$NEW_HOME"
+      rm -rf "$NEW_HOME"
       ln -sfn "$OLD_HOME" "$NEW_HOME"
     fi
   fi
@@ -57,6 +56,11 @@ cat >/etc/profile.d/adept-home.sh <<EOF
 export USER="${u}"
 export LOGNAME="${u}"
 export HOME="${NEW_HOME}"
+if [ "\$PWD" = "${OLD_HOME}" ]; then
+  cd "${NEW_HOME}" 2>/dev/null || true
+elif [[ "\$PWD" == "${OLD_HOME}/"* ]]; then
+  cd "${NEW_HOME}\${PWD#${OLD_HOME}}" 2>/dev/null || true
+fi
 EOF
 chmod 644 /etc/profile.d/adept-home.sh
 

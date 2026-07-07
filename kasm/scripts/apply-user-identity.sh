@@ -54,7 +54,7 @@ patch_container() {
      export KASM_USER="'"${kasm_user}"'"
      /usr/local/sbin/adept-set-identity 2>/dev/null' 2>/dev/null || return 1
 
-  who=$(docker exec "$cname" bash -lc 'whoami; echo HOME=$HOME' 2>/dev/null | tr '\n' ' ' || true)
+  who=$(docker exec "$cname" bash -lc 'whoami; echo HOME=$HOME; echo PWD=$PWD' 2>/dev/null | tr '\n' ' ' || true)
   echo "$who"
 }
 
