@@ -17,6 +17,11 @@ source "${SCRIPT_DIR}/lib/common.sh"
 LIVE=0
 [[ "${1:-}" == "--live" ]] && LIVE=1
 
+if [[ -x "${SCRIPT_DIR}/clean-profile-bashrc.sh" ]]; then
+  adept_log "Cleaning Adept hooks from persisted profile .bashrc files"
+  bash "${SCRIPT_DIR}/clean-profile-bashrc.sh"
+fi
+
 BASE_EXEC_JSON=$(python3 "${SCRIPT_DIR}/lib/adept_exec_config.py")
 BASE_EXEC_SQL=${BASE_EXEC_JSON//\'/\'\'}
 DEV_EXEC_JSON=$(python3 "${SCRIPT_DIR}/lib/adept_exec_config.py" adept-dev)
@@ -41,34 +46,9 @@ docker exec kasm_db psql -U kasmapp -d kasm -v ON_ERROR_STOP=1 -q -c \
   "UPDATE images SET exec_config = '${DEV_EXEC_SQL}'::json
    WHERE friendly_name LIKE 'Adept Dev%';"
 
-patch_container() {
-  local cname="$1" kasm_user who
-  kasm_user=$(docker exec "$cname" bash -lc 'echo -n "$KASM_USER"' 2>/dev/null || true)
-  [[ -n "$kasm_user" ]] || return 1
-
-  docker cp "${SCRIPT_DIR}/dev/adept-set-identity.sh" "${cname}:/tmp/adept-set-identity.sh" 2>/dev/null || return 1
-  docker cp "${SCRIPT_DIR}/dev/install-identity-hook.sh" "${cname}:/tmp/install-identity-hook.sh" 2>/dev/null || return 1
-
-  docker exec -u root -e KASM_USER="$kasm_user" "$cname" bash -c \
-    'bash /tmp/install-identity-hook.sh
-     export KASM_USER="'"${kasm_user}"'"
-     /usr/local/sbin/adept-set-identity 2>/dev/null' 2>/dev/null || return 1
-
-  who=$(docker exec "$cname" bash -lc 'whoami; echo HOME=$HOME; echo PWD=$PWD' 2>/dev/null | tr '\n' ' ' || true)
-  echo "$who"
-}
-
 if [[ "$LIVE" -eq 1 ]]; then
   adept_log "Patching all running session containers"
-  while read -r cname; do
-    [[ -n "$cname" ]] || continue
-    who=$(patch_container "$cname" || echo "")
-    if [[ -n "$who" ]]; then
-      adept_log "  OK ${cname} -> whoami=${who}"
-    else
-      adept_log "  SKIP ${cname} (no KASM_USER or not a session)"
-    fi
-  done < <(docker ps --format '{{.Names}}' | grep -vE '^kasm_' || true)
+  bash "${SCRIPT_DIR}/patch-session-identity.sh"
 fi
 
 adept_log "Done. All users: whoami matches Kasm username on every workspace type."

@@ -37,4 +37,18 @@ root_pct=$(df / | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
 data_pct=$(df /data | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
 [[ "$data_pct" -lt 90 ]]; check "data disk ${data_pct}% used" $?
 
+# Self-heal + verify workspace identity (whoami must not stay kasm-user).
+bash "${SCRIPT_DIR}/patch-session-identity.sh" 2>/dev/null || true
+identity_fail=0
+while read -r cname; do
+  [[ -n "$cname" ]] || continue
+  who=$(docker exec "$cname" whoami 2>/dev/null || echo "")
+  home=$(docker exec "$cname" bash -lc 'getent passwd "$(whoami)" 2>/dev/null | cut -d: -f6' 2>/dev/null || echo "")
+  if [[ "$who" == "kasm-user" || "$home" == "/home/kasm-user" ]]; then
+    adept_log "FAIL: session ${cname} still kasm-user (home=${home})"
+    identity_fail=1
+  fi
+done < <(docker ps --format '{{.Names}}' | grep -vE '^kasm_' || true)
+[[ "$identity_fail" -eq 0 ]]; check "session identity (whoami + home)" "$identity_fail"
+
 exit "$FAIL"

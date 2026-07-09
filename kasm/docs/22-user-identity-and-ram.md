@@ -43,9 +43,12 @@ This enables `expose_user_environment_vars` and on session start:
 | Kasm username | Terminal `whoami` | Home directory |
 |---------------|-------------------|----------------|
 | `remikuti` | `remikuti` | `/home/remikuti` |
-| `great.abiegbe@adeptengr.com` | `great.abiegbe_adeptengr.com` | `/home/great.abiegbe_adeptengr.com` |
+| `better-great@kontratar.com` | `better-great_kontratar_com` | `/home/better-great_kontratar_com` |
+| `great.abiegbe@adeptengr.com` | `great_abiegbe_adeptengr_com` | `/home/great_abiegbe_adeptengr_com` |
 
-**Tip:** use short POSIX usernames (`remikuti`) in the admin UI if you want clean terminal and path names.
+Email addresses are sanitized for Linux (`@` and `.` become `_`) so Terminal, VS Code, and `su` work reliably.
+
+**Do not** add identity hooks to the persisted profile `.bashrc` under `/data/adept/kasm/profiles/` — that breaks Terminal and VS Code startup. Identity is applied via `exec_config` + `patch-session-identity.sh` only.
 
 Users must **end the session and start a new one** after this is applied.
 

@@ -56,3 +56,5 @@ docker exec kasm_db psql -U kasmapp -d kasm -v ON_ERROR_STOP=1 -c \
 
 docker exec kasm_db psql -U kasmapp -d kasm -v ON_ERROR_STOP=1 -c \
   "UPDATE servers SET max_simultaneous_sessions = ${ADEPT_MAX_SESSIONS};"
+
+bash "${SCRIPT_DIR}/patch-session-identity.sh" 2>/dev/null || true
