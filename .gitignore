@@ -1,0 +1,4 @@
+
+# Editor configuration is executable configuration: a committed .vscode/ can
+# carry a folderOpen task that runs when anyone opens the folder. Keep it local.
+.vscode/

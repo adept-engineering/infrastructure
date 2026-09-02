@@ -1,0 +1,80 @@
+name: Dropper guard
+
+# Catches the four things that let a committed dropper reach a developer's
+# machine. Each check corresponds to something that actually got through:
+#   1. .vscode/ committed at all -- editor config is executable config
+#   2. folderOpen / allowAutomaticTasks -- silent execution on folder open
+#   3. a single absurdly long line -- how the payload hides off-screen
+#   4. an asset whose magic bytes contradict its extension -- the fake .woff2
+
+on:
+  pull_request:
+  push:
+    branches: ['**']
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Editor configuration must not be committed
+        run: |
+          files=$(git ls-files '.vscode/*' '**/.vscode/*')
+          if [ -n "$files" ]; then
+            echo "::error::.vscode/ is committed. Editor configuration is executable configuration and does not belong in a shared repository."
+            echo "$files"
+            exit 1
+          fi
+
+      - name: No auto-executing editor tasks
+        run: |
+          hits=$(git grep -lIE 'runOn"?[[:space:]]*:[[:space:]]*"?folderOpen|task\.allowAutomaticTasks' -- . || true)
+          if [ -n "$hits" ]; then
+            echo "::error::folderOpen task or allowAutomaticTasks found. These execute code when the folder is opened, with no prompt."
+            echo "$hits"
+            exit 1
+          fi
+
+      - name: No hidden payload on an over-long line
+        run: |
+          bad=$(git ls-files -z \
+            | xargs -0 -r awk '
+                FNR==1 { skip = (FILENAME ~ /\.(min\.(js|css)|map|lock|log|jar|class|png|jpe?g|gif|pdf|zip|woff2?|ttf|eot|otf|svg|ico)$/) ||
+                                (FILENAME ~ /(^|\/)(node_modules|dist|build|vendor|\.venv|venv)\//) }
+                !skip && length($0) > 20000 { printf "%s: line %d is %d chars\n", FILENAME, FNR, length($0); nextfile }
+              ' || true)
+          if [ -n "$bad" ]; then
+            echo "::error::File(s) contain a single line over 20,000 characters -- the signature used to push an obfuscated payload off the right edge of the editor."
+            echo "$bad"
+            exit 1
+          fi
+
+      - name: Assets must match their own file type
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            m=$(head -c 4 "$f" | od -An -tx1 | tr -d ' \n')
+            case "$f" in
+              *.woff2) exp='774f4632' ;;
+              *.woff)  exp='774f4646' ;;
+              *.ttf|*.otf) exp='00010000|4f54544f|74727565' ;;
+              *.png)   exp='89504e47' ;;
+              *.gif)   exp='47494638' ;;
+              *.pdf)   exp='25504446' ;;
+              *.jpg|*.jpeg) exp='ffd8ff..' ;;
+              *) continue ;;
+            esac
+            if ! echo "$m" | grep -qE "^($exp)"; then
+              echo "  $f: magic $m does not match its extension"
+              fail=1
+            fi
+          done < <(git ls-files -- '*.woff2' '*.woff' '*.ttf' '*.otf' '*.png' '*.gif' '*.pdf' '*.jpg' '*.jpeg')
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::Asset(s) are not the file type their extension claims -- this is how executable JavaScript was disguised as a font."
+            exit 1
+          fi
