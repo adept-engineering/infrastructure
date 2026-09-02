@@ -41,40 +41,42 @@ jobs:
 
       - name: No hidden payload on an over-long line
         run: |
-          bad=$(git ls-files -z \
-            | xargs -0 -r awk '
-                FNR==1 { skip = (FILENAME ~ /\.(min\.(js|css)|map|lock|log|jar|class|png|jpe?g|gif|pdf|zip|woff2?|ttf|eot|otf|svg|ico)$/) ||
-                                (FILENAME ~ /(^|\/)(node_modules|dist|build|vendor|\.venv|venv)\//) }
-                !skip && length($0) > 20000 { printf "%s: line %d is %d chars\n", FILENAME, FNR, length($0); nextfile }
-              ' || true)
+          # Only TEXT files can hide a JS payload. grep -I reports no match on a
+          # binary file, so this skips .bin/.db/.jar/images without needing an
+          # extension list -- an extension list missed chroma_db/*.bin first time.
+          bad=""
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            grep -Iq . "$f" 2>/dev/null || continue          # binary -> skip
+            case "$f" in
+              *.min.js|*.min.css|*.map|*.lock|*-lock.json|*.log) continue ;;
+              node_modules/*|*/node_modules/*|dist/*|*/dist/*|build/*|*/build/*|vendor/*|*/vendor/*) continue ;;
+            esac
+            hit=$(awk 'length($0) > 20000 { printf "%s: line %d is %d chars", FILENAME, FNR, length($0); exit }' "$f")
+            [ -n "$hit" ] && bad="$bad$hit\n"
+          done < <(git ls-files)
           if [ -n "$bad" ]; then
             echo "::error::File(s) contain a single line over 20,000 characters -- the signature used to push an obfuscated payload off the right edge of the editor."
-            echo "$bad"
+            printf "%b" "$bad"
             exit 1
           fi
 
-      - name: Assets must match their own file type
+      - name: Assets must not actually be text
         run: |
+          # The payload was JavaScript named .woff2, padded with tabs/spaces, so
+          # its first bytes were whitespace instead of a binary signature. Only
+          # flag an asset that is TEXT -- a .png that is really a .jpg is a
+          # harmless mislabel and is not what this is looking for.
           fail=0
           while IFS= read -r f; do
             [ -f "$f" ] || continue
-            m=$(head -c 4 "$f" | od -An -tx1 | tr -d ' \n')
-            case "$f" in
-              *.woff2) exp='774f4632' ;;
-              *.woff)  exp='774f4646' ;;
-              *.ttf|*.otf) exp='00010000|4f54544f|74727565' ;;
-              *.png)   exp='89504e47' ;;
-              *.gif)   exp='47494638' ;;
-              *.pdf)   exp='25504446' ;;
-              *.jpg|*.jpeg) exp='ffd8ff..' ;;
-              *) continue ;;
-            esac
-            if ! echo "$m" | grep -qE "^($exp)"; then
-              echo "  $f: magic $m does not match its extension"
+            if grep -Iq . "$f" 2>/dev/null; then
+              echo "  $f: declared a binary asset but its contents are text"
+              head -c 80 "$f" | od -c | head -2
               fail=1
             fi
-          done < <(git ls-files -- '*.woff2' '*.woff' '*.ttf' '*.otf' '*.png' '*.gif' '*.pdf' '*.jpg' '*.jpeg')
+          done < <(git ls-files -- '*.woff2' '*.woff' '*.ttf' '*.otf' '*.eot' '*.png' '*.gif' '*.pdf' '*.jpg' '*.jpeg' '*.ico')
           if [ "$fail" -ne 0 ]; then
-            echo "::error::Asset(s) are not the file type their extension claims -- this is how executable JavaScript was disguised as a font."
+            echo "::error::Asset(s) contain text, not binary data -- this is how executable JavaScript was disguised as a font."
             exit 1
           fi
